@@ -1,6 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>JT809协议交通809协议简单实现(Java版)</title>
+    <url>/tool/JT809%E5%8D%8F%E8%AE%AE%E4%BA%A4%E9%80%9A809%E5%8D%8F%E8%AE%AE%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0-Java%E7%89%88.html</url>
+    <content><![CDATA[<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>最近公司有个项目需要接收公交公司的实时推送的公交车位置数据。于是就用Netty简单实现了JT809协议的部分功能。</p>
+<ul>
+<li><h5 id="服务端-上级平台-主链路"><a href="#服务端-上级平台-主链路" class="headerlink" title="服务端(上级平台)主链路"></a>服务端(上级平台)主链路</h5></li>
+<li><h5 id="主链路登录请求报文解析"><a href="#主链路登录请求报文解析" class="headerlink" title="主链路登录请求报文解析"></a>主链路登录请求报文解析</h5></li>
+<li><h5 id="主链路登录应答消息"><a href="#主链路登录应答消息" class="headerlink" title="主链路登录应答消息"></a>主链路登录应答消息</h5></li>
+<li><h5 id="车辆实时车辆定位信息消息报文解析"><a href="#车辆实时车辆定位信息消息报文解析" class="headerlink" title="车辆实时车辆定位信息消息报文解析"></a>车辆实时车辆定位信息消息报文解析</h5></li>
+</ul>
+<h2 id="主要代码和使用"><a href="#主要代码和使用" class="headerlink" title="主要代码和使用"></a>主要代码和使用</h2><ul>
+<li>项目结构</li>
+</ul>
+<p><img src="http://qiniu.mrain22.cn/201911101443_397.png" alt=""></p>
+<h3 id="解码适配器"><a href="#解码适配器" class="headerlink" title="解码适配器"></a>解码适配器</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.xiuminglee.jt809.protocol;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cn.xiuminglee.jt809.common.util.CommonUtils;</span><br><span class="line"><span class="keyword">import</span> cn.xiuminglee.jt809.common.util.CrcUtil;</span><br><span class="line"><span class="keyword">import</span> cn.xiuminglee.jt809.common.util.PacketDecoderUtils;</span><br><span class="line"><span class="keyword">import</span> cn.xiuminglee.jt809.packet.JT809BasePacket;</span><br><span class="line"><span class="keyword">import</span> cn.xiuminglee.jt809.protocol.decoder.DecoderFactory;</span><br><span class="line"><span class="keyword">import</span> io.netty.buffer.ByteBuf;</span><br><span class="line"><span class="keyword">import</span> io.netty.channel.ChannelHandlerContext;</span><br><span class="line"><span class="keyword">import</span> io.netty.handler.codec.ByteToMessageDecoder;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> cn.xiuminglee.jt809.common.util.CommonUtils.PACKET_CACHE;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: Xiuming Lee</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Describe</span>: 解码适配器</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JT809DecoderAdapter</span> <span class="keyword">extends</span> <span class="title">ByteToMessageDecoder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger log = LoggerFactory.getLogger(JT809DecoderAdapter.class);</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">decode</span><span class="params">(ChannelHandlerContext ctx, ByteBuf in, List&lt;Object&gt; out)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//判断是否有可读的字节</span></span><br><span class="line">        <span class="keyword">if</span> (in.readableBytes() &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 1、进行转义</span></span><br><span class="line">        <span class="keyword">byte</span>[] bytes = PacketDecoderUtils.decoderEscape(in);</span><br><span class="line">        <span class="comment">// 2、校验crc</span></span><br><span class="line">        <span class="keyword">if</span> (!CrcUtil.checkCRC(bytes))&#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 3、判断是那种类型的数据，交给具体的解码器类完成。</span></span><br><span class="line">        ByteBuf byteBuf = CommonUtils.getByteBuf(bytes);</span><br><span class="line">        byteBuf.skipBytes(<span class="number">9</span>);</span><br><span class="line">        <span class="comment">// 获取业务标志</span></span><br><span class="line">        <span class="keyword">short</span> msgId = byteBuf.readShort();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 交给具体的解码器</span></span><br><span class="line">        JT809BasePacket packet = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            packet = DecoderFactory.getDecoder(msgId).decoder(bytes);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">if</span> (e <span class="keyword">instanceof</span> NullPointerException) &#123;</span><br><span class="line">                <span class="comment">// log.info("没有可用的解析器，忽略这条信息！此信息不在业务范围内。");</span></span><br><span class="line">                <span class="comment">// 没有可用的解析器，忽略这条信息！此信息不在业务范围内。</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                log.error(<span class="string">"报文解析出错！错误信息：&#123;&#125;；报文信息：&#123;&#125;；"</span>,e.getMessage(),PACKET_CACHE.get(Thread.currentThread().getName()));</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        out.add(packet);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这个解码适配器会根据报文的业务标志从<code>DecoderFactory</code>获取具体的解码器去解析报文。</p>
+<p>所以如果需要扩展，只需要编写相关业务的解码器并添加到<code>DecoderFactory</code>即可。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.xiuminglee.jt809.protocol.decoder;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cn.xiuminglee.jt809.common.Const;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: Xiuming Lee</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Describe</span>: 解码工厂类</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DecoderFactory</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;Short,Decoder&gt; DECODER_FACTORY = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        DECODER_FACTORY.put(Const.BusinessDataType.UP_CONNECT_REQ,<span class="keyword">new</span> LoginDecoder());</span><br><span class="line">        DECODER_FACTORY.put(Const.BusinessDataType.UP_LINKTEST_REQ,<span class="keyword">new</span> HeartbeatDecoder());</span><br><span class="line">        DECODER_FACTORY.put(Const.BusinessDataType.UP_EXG_MSG,<span class="keyword">new</span> JT809Packet0x1202Decoder());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> businessDataType 业务数据类型标志</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 具体的解码器</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Decoder <span class="title">getDecoder</span><span class="params">(<span class="keyword">short</span> businessDataType)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> DECODER_FACTORY.get(businessDataType);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="GitHub地址"><a href="#GitHub地址" class="headerlink" title="GitHub地址"></a><a href="https://github.com/XiumingLee/MingRepository/tree/master/JT809-Server" target="_blank" rel="noopener">GitHub地址</a></h2>]]></content>
+      <categories>
+        <category>tool</category>
+      </categories>
+      <tags>
+        <tag>tool</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>一键将图片上传到七牛云并将图片链接添加到电脑粘贴板</title>
+    <url>/tool/%E4%B8%80%E9%94%AE%E5%B0%86%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0%E5%88%B0%E4%B8%83%E7%89%9B%E4%BA%91%E5%B9%B6%E5%B0%86%E5%9B%BE%E7%89%87%E9%93%BE%E6%8E%A5%E6%B7%BB%E5%8A%A0%E5%88%B0%E7%94%B5%E8%84%91%E7%B2%98%E8%B4%B4%E6%9D%BF.html</url>
+    <content><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>由于本人平时记笔记写博客时需要将一些例图之类的上传到七牛云图床，之前在Windows平台使用很还用的工具可以一键上传到七牛云，最近将工作环境迁移到Mac环境了，并没有找到合适的方便的工具，于是就好了一点时间自己写了一个。先看效果图吧。</p>
+<p><img src="http://qiniu.mrain22.cn/1573359587234.gif" alt=""></p>
+<p>GIf图有点快。大体说一下：</p>
+<ul>
+<li>截图后打开<code>qiniu-tools</code>界面按<code>Shift</code> + <code>Ctrl</code> + <code>V</code>即可将图片上传到七牛云图床。</li>
+<li>也可以复制网页中的图片上传。</li>
+<li>当然本地图片也是可以的。</li>
+<li>当你觉得刚刚上传的图片不合适时，可以点击删除按钮，删除刚刚上传的图片。</li>
+</ul>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="推荐"><a href="#推荐" class="headerlink" title="推荐"></a>推荐</h3><p>如果你是一名程序猿，推荐在安装了java环境下直接运行jar包，将<code>conf.properties</code>配置文件放在与jar同级目录下。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">## conf.properties  配置自己的七牛云信息。</span><br><span class="line">access-key=****</span><br><span class="line">secret-key=****</span><br><span class="line"># 七牛配置的域名地址</span><br><span class="line">qiniu-path=***</span><br><span class="line"># 上传到那个存储空间</span><br><span class="line">bucket-name=***</span><br></pre></td></tr></table></figure>
+<h3 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h3><ol>
+<li>将<code>qiniu-tools\app</code>目录下的<code>conf.properties</code>修改为自己的配置。</li>
+<li>运行<code>qiniu-tools\</code>目录下的<code>qiniu-tools.exe</code>即可。</li>
+</ol>
+<h3 id="MAC"><a href="#MAC" class="headerlink" title="MAC"></a>MAC</h3><ol>
+<li>修改<code>qiniu-tools.app/Contents/Java</code>下的<code>conf.properties</code>修改为自己的配置。</li>
+<li>运行<code>qiniu-tools.app</code>即可。</li>
+</ol>
+<h2 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h2><p>请前往<a href="https://github.com/XiumingLee/qiniu-tools" target="_blank" rel="noopener">GitHub地址</a>寻找下载地址。<a href="https://github.com/XiumingLee/qiniu-tools" target="_blank" rel="noopener">https://github.com/XiumingLee/qiniu-tools</a></p>
+<p>喜欢的麻烦给个Star，你的Star就是对我开源的最大支持和动力。谢谢</p>
+]]></content>
+      <categories>
+        <category>tool</category>
+      </categories>
+      <tags>
+        <tag>tool</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Spring Websocket实时统计在线用户数</title>
     <url>/Spring-Boot/Spring%20Websocket%E5%AE%9E%E6%97%B6%E7%BB%9F%E8%AE%A1%E5%9C%A8%E7%BA%BF%E7%94%A8%E6%88%B7%E6%95%B0.html</url>
     <content><![CDATA[<h1 id="GitHub源码地址"><a href="#GitHub源码地址" class="headerlink" title="GitHub源码地址"></a><a href="https://github.com/XiumingLee/MingRepository/tree/master/websocket" target="_blank" rel="noopener">GitHub源码地址</a></h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>最近有个需求，需要实时统计在线的人数，由于该项目并没用到实时通信，也只有这里需要实时统计在线，没必要再搭建一套实时通信服务，所以直接整合的<code>Spring Websocket</code>。下面的<code>demo</code>是项目中的简化版，使用<code>Spring Boot</code>搭建的环境。效果如图所示：</p>
