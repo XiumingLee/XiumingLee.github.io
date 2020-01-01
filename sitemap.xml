@@ -2,14 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://mrain22.cn/tags/index.html</loc>
+    <loc>https://mrain22.cn/categories/index.html</loc>
     
     <lastmod>2019-12-23T08:00:12.982Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mrain22.cn/categories/index.html</loc>
+    <loc>https://mrain22.cn/tags/index.html</loc>
     
     <lastmod>2019-12-23T08:00:12.982Z</lastmod>
     
@@ -79,14 +79,14 @@
   </url>
   
   <url>
-    <loc>https://mrain22.cn/Spring-Boot/SpringBoot%E3%80%81SpringSecurity%E3%80%81Vue%E6%95%B4%E5%90%88JWT%E8%AE%A4%E8%AF%81.html</loc>
+    <loc>https://mrain22.cn/Spring-Boot/Spring%20Websocket%E5%AE%9E%E6%97%B6%E7%BB%9F%E8%AE%A1%E5%9C%A8%E7%BA%BF%E7%94%A8%E6%88%B7%E6%95%B0.html</loc>
     
     <lastmod>2019-12-23T08:00:12.979Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mrain22.cn/Spring-Boot/Spring%20Websocket%E5%AE%9E%E6%97%B6%E7%BB%9F%E8%AE%A1%E5%9C%A8%E7%BA%BF%E7%94%A8%E6%88%B7%E6%95%B0.html</loc>
+    <loc>https://mrain22.cn/Spring-Boot/SpringBoot%E3%80%81SpringSecurity%E3%80%81Vue%E6%95%B4%E5%90%88JWT%E8%AE%A4%E8%AF%81.html</loc>
     
     <lastmod>2019-12-23T08:00:12.979Z</lastmod>
     

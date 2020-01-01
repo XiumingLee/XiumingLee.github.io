@@ -12,5 +12,5 @@ Disallow: /fonts/
 Disallow: /vendors/
 Disallow: /fancybox/
 
-Sitemap: http://Xiuminglee.cn/sitemap.xml
-Sitemap: http://Xiuminglee.cn/baidusitemap.xml
+Sitemap: http://XiumingLee.cn/sitemap.xml
+Sitemap: http://XiumingLee.cn/baidusitemap.xml
