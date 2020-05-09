@@ -1,4 +1,4 @@
-https://xiuminglee.cn/Java-Python/抓取Bilibili哔哩哔哩网站视频-Java和Python双版本实现.html
+https://xiuminglee.cn/Java/Python/抓取Bilibili哔哩哔哩网站视频-Java和Python双版本实现.html
 https://xiuminglee.cn/Java/Java-Bean验证基础.html
 https://xiuminglee.cn/Jackson/Jackson-ObjectMapper的使用.html
 https://xiuminglee.cn/Jackson/Jackson注解使用示例.html

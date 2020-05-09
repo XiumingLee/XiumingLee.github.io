@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>抓取Bilibili哔哩哔哩网站视频(Java和Python双版本实现)</title>
-    <url>/Java-Python/%E6%8A%93%E5%8F%96Bilibili%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E7%BD%91%E7%AB%99%E8%A7%86%E9%A2%91-Java%E5%92%8CPython%E5%8F%8C%E7%89%88%E6%9C%AC%E5%AE%9E%E7%8E%B0.html</url>
+    <url>/Java/Python/%E6%8A%93%E5%8F%96Bilibili%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E7%BD%91%E7%AB%99%E8%A7%86%E9%A2%91-Java%E5%92%8CPython%E5%8F%8C%E7%89%88%E6%9C%AC%E5%AE%9E%E7%8E%B0.html</url>
     <content><![CDATA[<h2 id="1、B站视频真实地址分析"><a href="#1、B站视频真实地址分析" class="headerlink" title="1、B站视频真实地址分析"></a>1、B站视频真实地址分析</h2><blockquote>
 <p>我一直觉得编程语言只是一种工具，重要的是思想🐶。下面先来分析下B站视频的真实地址。</p>
 </blockquote>
@@ -79,10 +79,14 @@
 <h2 id="3、源码地址"><a href="#3、源码地址" class="headerlink" title="3、源码地址"></a>3、源码地址</h2><p><a href="https://github.com/XiumingLee/MingRepository/tree/master/BiliVedioDownload" target="_blank" rel="noopener">GitHub源码地址</a></p>
 ]]></content>
       <categories>
-        <category>Java,Python</category>
+        <category>Java</category>
+        <category>Python</category>
       </categories>
       <tags>
-        <tag>爬虫,Java,Python,Bilibili</tag>
+        <tag>Java</tag>
+        <tag>爬虫</tag>
+        <tag>Python</tag>
+        <tag>Bilibili</tag>
       </tags>
   </entry>
   <entry>
