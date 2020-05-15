@@ -1,5 +1,5 @@
+https://xiuminglee.cn/转载/Deno极速入门.html
 https://xiuminglee.cn/转载/Deno正式发布，彻底弄明白和Node的区别.html
 https://xiuminglee.cn/Java/Python/抓取Bilibili哔哩哔哩网站视频-Java和Python双版本实现.html
 https://xiuminglee.cn/Java/Java-Bean验证基础.html
 https://xiuminglee.cn/Jackson/Jackson-ObjectMapper的使用.html
-https://xiuminglee.cn/Jackson/Jackson注解使用示例.html
