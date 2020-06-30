@@ -1,6 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>基于SpringBoot和JavaFX桌面端工具集 包含:七牛云图片上传,截图转文字(OCR),翻译和批量文件重命名</title>
+    <url>/SpringBoot/JavaFX/%E5%9F%BA%E4%BA%8ESpringBoot%E5%92%8CJavaFX%E6%A1%8C%E9%9D%A2%E7%AB%AF%E5%B7%A5%E5%85%B7%E9%9B%86-%E5%8C%85%E5%90%AB-%E4%B8%83%E7%89%9B%E4%BA%91%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0-%E6%88%AA%E5%9B%BE%E8%BD%AC%E6%96%87%E5%AD%97-OCR-%E7%BF%BB%E8%AF%91%E5%92%8C%E6%89%B9%E9%87%8F%E6%96%87%E4%BB%B6%E9%87%8D%E5%91%BD%E5%90%8D.html</url>
+    <content><![CDATA[<h2 id="产生的背景"><a href="#产生的背景" class="headerlink" title="产生的背景"></a>产生的背景</h2><blockquote>
+<p>作为一名程序员，平时记笔记时，总是要用一些图片来表达自己的思想，而我又比较喜欢将图片上传到七牛云，老是在网页中上传甚是麻烦，网上虽然也有不少相关的工具，但是我还是喜欢自己造轮子，而且并不复杂，所以就有了<strong>七牛云上传图片</strong>的功能。</p>
+<p>平时阅读电子书时，遇到精辟指出，总是情不自禁的想把它记录下来，奈何又懒得自己码字，<strong>OCR功能</strong>应运而生。</p>
+<p>有时候从网上下载的资源包，结尾总是带着小广告，赶紧试一下<strong>批量重命名功能</strong>吧。</p>
+<p>以后可能还有加其他的功能。当然你们如果有什么想法，也可以到<a href="https://github.com/XiumingLee/MingTools/issues" target="_blank" rel="noopener">这里</a>留言哦。</p>
+</blockquote>
+<h2 id="功能简介"><a href="#功能简介" class="headerlink" title="功能简介"></a>功能简介</h2><ul>
+<li><strong>七牛云</strong><ul>
+<li>图片一键上传 <code>Ctrl + Shift + V</code></li>
+<li>图片删除</li>
+</ul>
+</li>
+<li><strong>OCR和翻译</strong><ul>
+<li>百度图片OCR识别，图片转文字 <code>Ctrl + Shift + T</code></li>
+<li>百度翻译</li>
+</ul>
+</li>
+<li><strong>文件处理</strong><ul>
+<li>批量修改文件名称，取出文件中的指定字符串</li>
+<li>将文件名修改为汉语拼音。</li>
+</ul>
+</li>
+</ul>
+<h2 id="功能预览"><a href="#功能预览" class="headerlink" title="功能预览"></a>功能预览</h2><p><img src="https://img-blog.csdnimg.cn/20200630141720165.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1hpdW1pbmdMZWU=,size_16,color_FFFFFF,t_70" alt=""><img src="https://img-blog.csdnimg.cn/20200630141719820.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1hpdW1pbmdMZWU=,size_16,color_FFFFFF,t_70" alt=""><br><img src="https://img-blog.csdnimg.cn/2020063014190481.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1hpdW1pbmdMZWU=,size_16,color_FFFFFF,t_70" alt=""></p>
+<h2 id="功能使用"><a href="#功能使用" class="headerlink" title="功能使用"></a>功能使用</h2><blockquote>
+<p>打包完成后，目录是这样的。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">.</span><br><span class="line">├── conf</span><br><span class="line">│   └── application.yaml   ## 配置文件</span><br><span class="line">├── lib</span><br><span class="line">│   └── ming-tools.jar</span><br><span class="line">├── run-jre.bat</span><br><span class="line">├── run-jre.sh</span><br><span class="line">├── run.bat  ## windows启动脚本</span><br><span class="line">└── run.sh   ## mac、linux启动脚本</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>注意：</code></p>
+<p><code>run-jre.bat</code>、<code>run-jre.sh</code>是当你的电脑上<code>没有JDK环境时</code>，可以使用定制的<code>JRE环境</code>运行。加入<code>JRE环境</code>的目录是这样的</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> .</span><br><span class="line"><span class="meta">&gt;</span> ├── conf</span><br><span class="line"><span class="meta">&gt;</span> │   └── application.yaml   ## 配置文件</span><br><span class="line"><span class="meta">&gt;</span> ├── lib</span><br><span class="line"><span class="meta">&gt;</span> │   └── ming-tools.jar</span><br><span class="line"><span class="meta">&gt;</span> ├── jre       ## 这里多了一个jre的目录。</span><br><span class="line"><span class="meta">&gt;</span> ├── run-jre.bat</span><br><span class="line"><span class="meta">&gt;</span> ├── run-jre.sh</span><br><span class="line"><span class="meta">&gt;</span> ├── run.bat  ## windows启动脚本</span><br><span class="line"><span class="meta">&gt;</span> └── run.sh   ## mac、linux启动脚本</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>需要定制JRE的同学可以到<code>Q群：962917903</code>获取。当然你也可以自己定制或者直接安装JDK.</p>
+</blockquote>
+<h3 id="1、配置文件"><a href="#1、配置文件" class="headerlink" title="1、配置文件"></a>1、配置文件</h3><blockquote>
+<p>在使用<code>七牛云</code>和<code>OCR和翻译</code>功能时，需要到相应的网站获取自己的应用key和秘钥。</p>
+</blockquote>
+<ul>
+<li><h4 id="七牛云"><a href="#七牛云" class="headerlink" title="七牛云"></a>七牛云</h4></li>
+</ul>
+<p>创建存储空间：<a href="https://developer.qiniu.com/kodo/manual/1233/console-quickstart" target="_blank" rel="noopener">https://developer.qiniu.com/kodo/manual/1233/console-quickstart</a></p>
+<p>自己的秘钥：<a href="https://portal.qiniu.com/user/key" target="_blank" rel="noopener">https://portal.qiniu.com/user/key</a></p>
+<ul>
+<li><h4 id="OCR"><a href="#OCR" class="headerlink" title="OCR"></a>OCR</h4></li>
+</ul>
+<p>在以下网站创建应用，并获取<code>API Key</code> 和<code>Secret Key</code></p>
+<p><a href="https://console.bce.baidu.com/ai/#/ai/ocr/app/list" target="_blank" rel="noopener">https://console.bce.baidu.com/ai/#/ai/ocr/app/list</a></p>
+<ul>
+<li><h4 id="翻译"><a href="#翻译" class="headerlink" title="翻译"></a>翻译</h4></li>
+</ul>
+<p>在以下网站获取<code>APP ID</code>和<code>秘钥</code></p>
+<p><a href="https://fanyi-api.baidu.com/api/trans/product/desktop?req=developer" target="_blank" rel="noopener">https://fanyi-api.baidu.com/api/trans/product/desktop?req=developer</a></p>
+<p>将以上key和秘钥填写到<code>application.yaml</code>配置文件中</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">ming:</span></span><br><span class="line"><span class="attr">  tools:</span></span><br><span class="line"><span class="attr">    baidu:</span></span><br><span class="line"><span class="attr">      access-ocr-key:</span> <span class="string">Your</span> <span class="string">百度OCR</span> <span class="string">accessKey</span></span><br><span class="line"><span class="attr">      secret-ocr-key:</span> <span class="string">Your</span> <span class="string">百度OCR</span> <span class="string">secretKey</span></span><br><span class="line"><span class="attr">      access-trans-key:</span> <span class="string">Your</span> <span class="string">百度翻译</span> <span class="string">accessKey</span>  <span class="string">APP</span> <span class="string">ID</span></span><br><span class="line"><span class="attr">      secret-trans-key:</span> <span class="string">Your</span> <span class="string">百度翻译</span> <span class="string">secretKey</span></span><br><span class="line"><span class="attr">    qiniu:</span></span><br><span class="line"><span class="attr">      access-key:</span> <span class="string">Your</span> <span class="string">七牛云</span> <span class="string">accessKey</span></span><br><span class="line"><span class="attr">      secret-key:</span> <span class="string">Your</span> <span class="string">七牛云</span> <span class="string">secretKey</span></span><br><span class="line"><span class="attr">      bucket-name:</span> <span class="string">要上传到的空间</span></span><br><span class="line"><span class="attr">      file-path-prefix:</span> <span class="string">文件地址前缀，cdn地址</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>注意：</code>不使用的功能，可以不填写为自己的key和秘钥，但是不要删除或置为空。</p>
+</blockquote>
+<h3 id="2、启动软件"><a href="#2、启动软件" class="headerlink" title="2、启动软件"></a>2、启动软件</h3><blockquote>
+<ul>
+<li><strong>Mac/Linux</strong></li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;</span> sh run.sh</span><br><span class="line"><span class="meta">&gt;</span> </span><br><span class="line"><span class="meta">&gt;</span> ## sh run-jre.sh</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<ul>
+<li><h4 id="windows"><a href="#windows" class="headerlink" title="windows"></a>windows</h4></li>
+</ul>
+<p>双击<code>run.bat</code>即可</p>
+</blockquote>
+<h2 id="下载地址"><a href="#下载地址" class="headerlink" title="下载地址"></a>下载地址</h2><p><a href="https://github.com/XiumingLee/MingTools/releases" target="_blank" rel="noopener">下载地址</a></p>
+]]></content>
+      <categories>
+        <category>SpringBoot</category>
+        <category>JavaFX</category>
+      </categories>
+      <tags>
+        <tag>SpringBoot</tag>
+        <tag>JavaFX</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Deno极速入门</title>
     <url>/%E8%BD%AC%E8%BD%BD/Deno%E6%9E%81%E9%80%9F%E5%85%A5%E9%97%A8.html</url>
     <content><![CDATA[<blockquote>
