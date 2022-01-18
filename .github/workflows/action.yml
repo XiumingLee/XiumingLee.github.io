@@ -17,8 +17,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Install dependencies
-        run: npm install
       - name: Build with Maven
         run: mvn compile && mvn exec:java -Dexec.mainClass="cn.xiuminglee.home.page.Main"
       - name: Deploy to GitHub Pages
