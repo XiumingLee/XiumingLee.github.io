@@ -36,7 +36,6 @@ public class BlogUtils {
     }
 
     private static void buildBlogInfo(Element element,BlogInfo blogInfo){
-        //Element aElement = element.selectFirst("h4 > a");
         Element aElement = element.selectFirst("article > a");
         // href
         String href = aElement.attr("href");
@@ -61,11 +60,11 @@ public class BlogUtils {
         blogInfo.setSummary(summary);
 
         // date
-        String date = aElement.selectFirst("div.blog-list-footer > div.blog-list-footer-right").text();
+        String date = aElement.selectFirst("div.blog-list-footer > div > div.view-time-box").text();
         blogInfo.setDate(date);
 
         // readNum
-        Element readNumElement = aElement.selectFirst("div.blog-list-footer > div.blog-list-footer-left > div.view-num-box > span");
+        Element readNumElement = aElement.selectFirst("div.blog-list-footer > div > div.view-num-box > span");
         if (readNumElement != null) {
             String readNum = readNumElement.ownText();
             blogInfo.setReadNum(Integer.valueOf(readNum));
@@ -73,7 +72,7 @@ public class BlogUtils {
 
 
         // commentNum
-        Element commentNumElement = aElement.selectFirst("div.blog-list-footer > div.blog-list-footer-left > div.comment-box > span");
+        Element commentNumElement = aElement.selectFirst("div.blog-list-footer > div > div.comment-box > span");
         if (commentNumElement != null){
             String commentNum = commentNumElement.ownText();
             blogInfo.setCommentNum(Integer.valueOf(commentNum));
